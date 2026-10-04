@@ -6,7 +6,9 @@
             "isBuiltIn": true,
             "meshPath": "Meshes/TheRock/TheRock",
             "cfsDataPath": "",
-            "texDataPath": ""
+            "texDataPath": "",
+            "animatedTexturePath": "StreamingAssets/VideoTextures/TheRock_E230_30s_Unity.mp4",
+            "animatedTextureFps": 24.0
         }
     ]
 }
