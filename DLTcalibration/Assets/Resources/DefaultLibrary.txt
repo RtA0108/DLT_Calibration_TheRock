@@ -1,0 +1,12 @@
+{
+    "entries": [
+        {
+            "id": "TheRock",
+            "displayName": "TheRock (Low poly)",
+            "isBuiltIn": true,
+            "meshPath": "Meshes/TheRock/TheRock",
+            "cfsDataPath": "",
+            "texDataPath": ""
+        }
+    ]
+}

@@ -1,0 +1,50 @@
+# Unity 프로젝트 (DLTcalibration) 자동 생성 폴더
+DLTcalibration/[Ll]ibrary/
+DLTcalibration/[Tt]emp/
+DLTcalibration/[Oo]bj/
+DLTcalibration/[Bb]uild/
+DLTcalibration/[Bb]uilds/
+DLTcalibration/[Ll]ogs/
+DLTcalibration/[Uu]ser[Ss]ettings/
+DLTcalibration/[Mm]emoryCaptures/
+DLTcalibration/[Rr]ecordings/
+
+# IDE가 만드는 파일
+.vs/
+.idea/
+*.csproj
+*.sln
+*.suo
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.mdb
+*.opendb
+*.VC.db
+*.tmp
+
+# DLT_Rezero.dll이 쓰는 OpenCV DLL (126MB, GitHub 100MB 제한). 저장소에는 압축본(opencv_world480d.zip)만 있음
+DLTcalibration/Assets/Plugin/opencv_world480d.dll
+
+# DLT_Rezero (C++ DLL) 빌드 결과. Unity가 쓰는 DLL은 DLTcalibration/Assets/Plugin/DLT_Rezero.dll
+DLT_Rezero/x64/
+DLT_Rezero/**/x64/
+DLT_Rezero/Debug/
+DLT_Rezero/Release/
+
+# CfS-CNN 학습 네트워크 (약 370MB, GitHub 100MB 제한) - 따로 받아서 PythonScripts에 넣기
+DLTcalibration/PythonScripts/*.mat
+__pycache__/
+
+# 빌드 결과물, 기타
+*.apk
+*.aab
+*.unitypackage
+*.app
+sysinfo.txt
+crashlytics-build.properties
+*Zone.Identifier
+*Zone.Identifier.meta

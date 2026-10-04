@@ -1,0 +1,7 @@
+# TheRock material (TherockUnwrapping.obj + Textures/TheRockDiffuse.png)
+newmtl TheRockMat
+Ka 0.200000 0.200000 0.200000
+Kd 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+illum 1
+map_Kd TheRockDiffuse.png
