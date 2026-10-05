@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900">
+  <defs>
+    <style>
+      .bg{fill:#0b1220}.box{fill:#17243a;stroke:#58c4dc;stroke-width:3}.gen{fill:#2a2040;stroke:#c792ea;stroke-width:3}.out{fill:#17362f;stroke:#63d49d;stroke-width:3}.txt{fill:#f4f7fb;font-family:'Malgun Gothic','Noto Sans KR',sans-serif;font-size:27px;font-weight:700;text-anchor:middle}.sub{fill:#b9c8dd;font-family:'Malgun Gothic','Noto Sans KR',sans-serif;font-size:19px;text-anchor:middle}.arrow{stroke:#8aa4c7;stroke-width:5;fill:none;marker-end:url(#m)}.note{fill:#ffd580;font-family:'Malgun Gothic','Noto Sans KR',sans-serif;font-size:21px;font-weight:700;text-anchor:middle}
+    </style>
+    <marker id="m" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M0,0 L12,6 L0,12 z" fill="#8aa4c7"/></marker>
+  </defs>
+  <rect class="bg" width="1600" height="900"/>
+  <text class="txt" x="800" y="62" font-size="36">MSR/MSRG 기반 오디오 반응형 프로젝션 매핑</text>
+  <rect class="box" x="45" y="150" rx="22" width="240" height="150"/>
+  <text class="txt" x="165" y="205">입력</text><text class="sub" x="165" y="245">Mesh + UV + base</text><text class="sub" x="165" y="275">30 s audio + style</text>
+  <rect class="box" x="340" y="150" rx="22" width="260" height="150"/>
+  <text class="txt" x="470" y="200">표면 관찰</text><text class="sub" x="470" y="240">PartField hierarchy</text><text class="sub" x="470" y="270">24-view DINO + SAM2</text>
+  <rect class="box" x="655" y="150" rx="22" width="260" height="150"/>
+  <text class="txt" x="785" y="200">Editable MSRG</text><text class="sub" x="785" y="240">core / band / halo</text><text class="sub" x="785" y="270">role + graph + owner</text>
+  <rect class="box" x="970" y="150" rx="22" width="260" height="150"/>
+  <text class="txt" x="1100" y="200">오디오 계획</text><text class="sub" x="1100" y="240">5 control lanes</text><text class="sub" x="1100" y="270">start / overlap / hold</text>
+  <rect class="gen" x="1285" y="150" rx="22" width="270" height="150"/>
+  <text class="txt" x="1420" y="200">생성</text><text class="sub" x="1420" y="240">FLUX peak states</text><text class="sub" x="1420" y="270">LTX 145-frame motion</text>
+  <path class="arrow" d="M285 225H332"/><path class="arrow" d="M600 225H647"/><path class="arrow" d="M915 225H962"/><path class="arrow" d="M1230 225H1277"/>
+  <rect class="gen" x="260" y="465" rx="22" width="320" height="165"/>
+  <text class="txt" x="420" y="515">다중 시점 → UV</text><text class="sub" x="420" y="555">face ID + barycentric</text><text class="sub" x="420" y="585">visibility/facing/Huber fusion</text>
+  <rect class="box" x="640" y="465" rx="22" width="320" height="165"/>
+  <text class="txt" x="800" y="515">통합·보정</text><text class="sub" x="800" y="555">exclusive owner + handoff</text><text class="sub" x="800" y="585">seam / 3D fill / gutter</text>
+  <rect class="out" x="1020" y="465" rx="22" width="320" height="165"/>
+  <text class="txt" x="1180" y="515">최종 출력</text><text class="sub" x="1180" y="555">2048² × 720 frames</text><text class="sub" x="1180" y="585">H.264 + AAC / Unity</text>
+  <path class="arrow" d="M1420 300V380H420V457"/><path class="arrow" d="M580 548H632"/><path class="arrow" d="M960 548H1012"/>
+  <text class="note" x="800" y="732">사람 개입: MSR 수락·병합·계층 분할·역할 수정 / 사건 brief·prompt / 후보 선택 / 최종 미학 veto</text>
+  <text class="sub" x="800" y="785">완료 근거: E86 후보 용량 · E222 UV 소유권 · E227 soft fusion · E230 30 s · E231 audio scheduling</text>
+  <text class="sub" x="800" y="825">미완료: 독립 지각·저작 사용자 평가, cross-mesh 생성 일반화, 실제 projector 최종 평가</text>
+</svg>
