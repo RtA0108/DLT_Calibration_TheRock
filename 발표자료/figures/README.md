@@ -27,7 +27,7 @@
 | `19_e237_three_view_poster.png` | 귀·눈 동시 시작 직후 포스터 | E237 frame 383, `t=15.958초`; 1920×1080 |
 | `20_kangaroo_msr_concept.png` | 캥거루 동일 시점의 원본·hard partition·soft MSR 비교 | `kangaroo_msr_intrinsic_v45`의 고정 `a045/elevation 0°` face-ID와 실제 필드만 사용; 1680×912 |
 | `21_kangaroo_msrg_roles.png` | 캥거루 MSRG 자동 역할과 인접 관계 | `automatic_role_assignment_v57/kangaroo/manifest.json`의 자동 역할·무방향 `region_graph`만 사용; 1800×750 |
-| `22_slide6_e227_front_hard_soft.png` | 슬라이드 6용 정면 base/hard/soft 비교 | E227 원본 contact sheet의 정면 행을 픽셀 그대로 추출; 새 생성·보간·주석 없음; 840×302 |
+| `22_slide6_e222_face_boundary_closeup.png` | 슬라이드 6용 face 경계와 SAM2 관측 비교 | E222 실제 결과에서 차이가 잘 보이는 두 귀 경계만 픽셀 그대로 추출; 새 영역·생성·주석 없음; 256×156 |
 
 영상 16·17은 UV atlas 영상이므로 그 자체가 일반 카메라 영상처럼 보이지 않는다. Unity의 원본 메시 UV에 영상 텍스처로 적용한 뒤 3D 또는 실제 projector 결과를 발표 영상으로 보여 주는 것이 올바른 사용법이다.
 
@@ -74,13 +74,15 @@
 
 ### 22번 슬라이드 6 경계 비교 그림
 
-- 원본: `outputs/review_exports/experiment227/therock/front_carrier_soft_uv_r1/qa_hard_vs_soft_contact.jpg`
-- 원본 크기: 840×2416
-- 추출 범위: 왼쪽 위 `(0, 0)`에서 `840×302` 픽셀. 정면 `base / hard / soft` 세 패널과 원본 라벨만 포함한다.
-- 처리: crop만 수행했다. 크기 변경, 생성형 편집, 색 보정, 선명화, 보간, 새 라벨 추가는 하지 않았다.
-- 용도: 슬라이드 6의 `표면 영역 경계 표현의 한계` 항목에서 기존 갈비 개방 이미지를 대체한다. `hard`와 `soft`의 시각적 비교 사례이며, 물체가 조각나 보인다는 지각적 결론으로 확대 해석하지 않는다.
-- 정량 근거: E227의 cross-face residual gradient는 hard `2.6017`, soft `2.3629`로 `9.18%` 감소했다. 단일 메시·단일 사건의 공학적 ablation이다.
-- 결과 SHA-256: `8F093B275B8EA1B3BFD23F63B4581FBEE331D81D29120269921A75F780095393`
+- 원본: `outputs/review_exports/experiment222/therock/dense_ear_detection_r1/dense_oblique_sam_contact.png`
+- 원본 크기: 1792×558
+- 사용 관측: 위쪽 행의 right 80°와 right 100° 귀 경계 두 곳만 사용했다.
+- 추출 범위: 각각 `128×156` 픽셀. 원본 좌표 `(356, 55)`와 `(868, 55)`에서 crop한 뒤 좌우로 붙였다.
+- 처리: crop과 무간격 병치만 수행했다. 크기 변경, 생성형 편집, 색 보정, 선명화, 보간, 새 영역, 새 라벨은 추가하지 않았다.
+- 원본 표기 의미: 녹색 선은 기존 face 단위 범위, 흰색 선은 시점별 SAM2 경계, 주황색은 기존 범위 밖에서 추가 관측된 픽셀이다.
+- 용도: 슬라이드 6의 `표면 영역 경계 표현의 한계` 항목에서 기존 갈비 개방 이미지를 대체한다. 문구는 `face 단위 이진 영역은 실제 경계가 삼각형 내부를 지날 때 잘림이나 주변 누출이 발생한다`로 제한한다.
+- 근거 범위: E222는 일부 삼각형에 귀와 머리가 함께 포함돼 face 전체 선택과 제외 모두 오류가 남는 사례다. 일반적인 지각 품질 향상이나 모든 메시의 경계 개선을 뜻하지 않는다.
+- 결과 SHA-256: `D10A8B86BACABAAD8670EEA68C8D2159DDA869B59B58F8AC85FC0CCCB7F7A5CA`
 
 ## E237 3시점 발표 영상 재현 정보
 
