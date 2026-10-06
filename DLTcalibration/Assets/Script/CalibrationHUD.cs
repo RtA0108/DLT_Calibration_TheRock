@@ -45,6 +45,7 @@ public class CalibrationHUD : MonoBehaviour
         "     계산이 깨진 결과(좌우 뒤집힘 등)는 적용하지 않고 '보정 보류'로 알림 → 마커 짝 확인\n" +
         "     <b>L</b> 자동 보정 켜기/끄기, <b>F</b> 맞춘 마커로 지금 계산, <b>Backspace</b> 보정 초기화\n" +
         "5. 다 맞추면 <b>X</b>로 텍스처 입히기 (다시 누르면 끔. 모델을 바꾸거나 R을 누르면 다시 꺼짐)\n" +
+        "     <b>M</b> 마커 숨기기/보이기 (지우지 않음. 숨긴 동안은 끌기·방향키 안 됨, R을 누르면 다시 보임)\n" +
         "\n" +
         "<b>기타</b>\n" +
         "<b>1</b> 캘리브레이션 모드   <b>2</b> 히트맵   <b>3</b> 추천점 표시   (R을 누르면 1, 3은 자동으로 켜짐)\n" +
@@ -162,6 +163,7 @@ public class CalibrationHUD : MonoBehaviour
             (() => Animator4D == null || !Animator4D.HasModel ? "텍스처 (X): 모델 없음"
                                                               : $"텍스처 (X): {(Animator4D.TextureVisible ? "입힘" : "끔 (모양만)")}",
              () => { if (Animator4D != null) Animator4D.ToggleTextureVisible(); }),
+            (() => $"마커 (M): {(clickTest.MarkersHidden ? "숨김" : "보임")}", () => clickTest.ToggleMarkersHidden()),
             (() => Animator4D == null || !Animator4D.HasSequence ? "4D 텍스처: 없음"
                                                                 : $"4D 텍스처 (P): {(Animator4D.playing ? "재생 중" : "정지")}",
              () => { if (Animator4D != null) Animator4D.TogglePlaying(); }),
@@ -206,6 +208,8 @@ public class CalibrationHUD : MonoBehaviour
                 return $"<b>보정 보류:</b> {dltSolver.LastRejectReason}\n번호를 다른 곳에 맞춘 마커가 있는지 확인 ({placed}/{selected})";
             if (dltSolver != null && dltSolver.SuspectSlot >= 0)
                 return $"<b>확인:</b> {dltSolver.SuspectSlot + 1}번 마커(빨간색)가 다른 마커와 안 맞음\n맞춘 마커 {placed}/{selected}개";
+            if (clickTest.MarkersHidden)
+                return $"마커 숨김 · <b>M</b>으로 다시 보이기 (맞춘 마커 {placed}/{selected}개)";
             if (placed >= selected && Animator4D != null && Animator4D.HasModel && !Animator4D.TextureVisible)
                 return $"<b>다음:</b> 다 맞췄으면 <b>X</b>로 텍스처 입히기 ({placed}/{selected})";
             if (!clickTest.liveSolve) return $"맞춘 마커 {placed}/{selected}개 · <b>F</b>로 보정";
@@ -218,7 +222,7 @@ public class CalibrationHUD : MonoBehaviour
     // ---------------------------------------------------------------- 도움말 창
     private void BuildHelpPanel()
     {
-        RectTransform panel = NewRect("HelpPanel", transform, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(600f, 460f));
+        RectTransform panel = NewRect("HelpPanel", transform, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(620f, 480f));
         panel.gameObject.AddComponent<Image>().color = new Color(0f, 0f, 0f, 0.96f);
         panel.gameObject.AddComponent<Button>().onClick.AddListener(ToggleHelp); // 아무 곳이나 클릭하면 닫힘
 

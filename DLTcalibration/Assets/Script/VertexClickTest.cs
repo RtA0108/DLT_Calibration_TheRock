@@ -156,6 +156,33 @@ public class VertexClickTest : MonoBehaviour
         // '[' / ']' 키: 십자선 크기 줄이기/키우기
         if (Input.GetKeyDown(KeyCode.LeftBracket)) Marker.ChangeSize(-1);
         if (Input.GetKeyDown(KeyCode.RightBracket)) Marker.ChangeSize(+1);
+
+        // 'M' 키: 마커 숨기기/보이기
+        if (Input.GetKeyDown(KeyCode.M)) ToggleMarkersHidden();
+    }
+
+    // 보정을 마친 뒤 프로젝터에 텍스처만 보이도록 마커(십자선, 번호, 패치)를 숨긴다.
+    // 지우는 게 아니라 마커 층을 투명하게 할 뿐이라, 대응점과 보정 결과는 그대로이고 다시 보이게 할 수 있다.
+    // 숨긴 동안은 끌기와 방향키가 막혀서 보이지 않는 마커가 움직이지 않는다.
+    public bool MarkersHidden { get; private set; }
+    private CanvasGroup markerLayer;
+
+    public void ToggleMarkersHidden() => SetMarkersHidden(!MarkersHidden);
+
+    public void SetMarkersHidden(bool hidden)
+    {
+        if (markerLayer == null && markerManager != null && markerManager.canvasRectTransform != null)
+        {
+            markerLayer = markerManager.canvasRectTransform.GetComponent<CanvasGroup>();
+            if (markerLayer == null) markerLayer = markerManager.canvasRectTransform.gameObject.AddComponent<CanvasGroup>();
+        }
+        if (markerLayer == null) return;
+
+        MarkersHidden = hidden;
+        markerLayer.alpha = hidden ? 0f : 1f;
+        markerLayer.blocksRaycasts = !hidden;
+        markerLayer.interactable = !hidden;
+        Debug.Log(hidden ? "[Marker] 마커 숨김 (M으로 다시 보이기. 대응점과 보정 결과는 그대로)" : "[Marker] 마커 보이기");
     }
 
     public bool AlignmentView => alignmentView;
@@ -199,7 +226,7 @@ public class VertexClickTest : MonoBehaviour
     // 누르고 있는 동안 다시 계산은 0.2초에 한 번, 손을 떼면 마지막으로 한 번 (매 반복마다 풀면 끊겼음)
     private void NudgeActiveMarker()
     {
-        if (ActiveSlot < 0 || clickedObjects[ActiveSlot] == null) { nudgeSolvePending = false; return; }
+        if (ActiveSlot < 0 || clickedObjects[ActiveSlot] == null || MarkersHidden) { nudgeSolvePending = false; return; }
 
         Vector2 dir = Vector2.zero;
         if (Input.GetKey(KeyCode.LeftArrow)) dir.x -= 1f;
@@ -628,6 +655,7 @@ public class VertexClickTest : MonoBehaviour
         if (markerManager != null) markers[slot] = markerManager.CreateMarker(slot, screen, projectCam, this);
         AttachPatch(markers[slot], screen);
         SetSphereSelected(target, true);
+        if (MarkersHidden) SetMarkersHidden(false); // 새 마커를 만들면(R, Ctrl+클릭) 다시 보이게
 
         arrayIndex++;
         Debug.Log($"[Select] 추가됨 ({arrayIndex}개, 마커 {slot + 1}번): {target.name}");
