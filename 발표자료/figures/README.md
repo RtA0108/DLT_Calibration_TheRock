@@ -27,6 +27,7 @@
 | `19_e237_three_view_poster.png` | 귀·눈 동시 시작 직후 포스터 | E237 frame 383, `t=15.958초`; 1920×1080 |
 | `20_kangaroo_msr_concept.png` | 캥거루 동일 시점의 원본·hard partition·soft MSR 비교 | `kangaroo_msr_intrinsic_v45`의 고정 `a045/elevation 0°` face-ID와 실제 필드만 사용; 1680×912 |
 | `21_kangaroo_msrg_roles.png` | 캥거루 MSRG 자동 역할과 인접 관계 | `automatic_role_assignment_v57/kangaroo/manifest.json`의 자동 역할·무방향 `region_graph`만 사용; 1800×750 |
+| `22_slide6_e227_front_hard_soft.png` | 슬라이드 6용 정면 base/hard/soft 비교 | E227 원본 contact sheet의 정면 행을 픽셀 그대로 추출; 새 생성·보간·주석 없음; 840×302 |
 
 영상 16·17은 UV atlas 영상이므로 그 자체가 일반 카메라 영상처럼 보이지 않는다. Unity의 원본 메시 UV에 영상 텍스처로 적용한 뒤 3D 또는 실제 projector 결과를 발표 영상으로 보여 주는 것이 올바른 사용법이다.
 
@@ -70,6 +71,16 @@
 - 실선은 manifest의 무방향 `region_graph` 인접 관계만 중복 없이 그린 것이다.
 - **semantic-parent 단위의 방향성 전달 엣지 근거는 없음**. 따라서 화살표를 만들지 않았다. Barrier는 v57에서 독립 노드가 아니라 `path_side_physical_geodesic_interface` 방식의 관계적 역할이므로 별도 노드로 만들지 않았다.
 - 결과 SHA-256: `C561236899B1D99FD90F2D7F0FCD02575D271CBC5248056BD0C47D5C0E8A6C7D`
+
+### 22번 슬라이드 6 경계 비교 그림
+
+- 원본: `outputs/review_exports/experiment227/therock/front_carrier_soft_uv_r1/qa_hard_vs_soft_contact.jpg`
+- 원본 크기: 840×2416
+- 추출 범위: 왼쪽 위 `(0, 0)`에서 `840×302` 픽셀. 정면 `base / hard / soft` 세 패널과 원본 라벨만 포함한다.
+- 처리: crop만 수행했다. 크기 변경, 생성형 편집, 색 보정, 선명화, 보간, 새 라벨 추가는 하지 않았다.
+- 용도: 슬라이드 6의 `표면 영역 경계 표현의 한계` 항목에서 기존 갈비 개방 이미지를 대체한다. `hard`와 `soft`의 시각적 비교 사례이며, 물체가 조각나 보인다는 지각적 결론으로 확대 해석하지 않는다.
+- 정량 근거: E227의 cross-face residual gradient는 hard `2.6017`, soft `2.3629`로 `9.18%` 감소했다. 단일 메시·단일 사건의 공학적 ablation이다.
+- 결과 SHA-256: `8F093B275B8EA1B3BFD23F63B4581FBEE331D81D29120269921A75F780095393`
 
 ## E237 3시점 발표 영상 재현 정보
 
