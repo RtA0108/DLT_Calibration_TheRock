@@ -292,7 +292,7 @@ def build_static_canvas(
 
     draw.rectangle((0, TIMELINE_TOP, WIDTH, HEIGHT), fill=(8, 10, 15))
     draw.line((0, TIMELINE_TOP, WIDTH, TIMELINE_TOP), fill=(48, 53, 62), width=2)
-    draw.text((25, 809), "E237 · 오디오 사건 타임라인", font=bold, fill=(245, 246, 248))
+    draw.text((25, 809), "오디오 사건 타임라인", font=bold, fill=(245, 246, 248))
 
     timeline_left = 250
     timeline_right = 1880

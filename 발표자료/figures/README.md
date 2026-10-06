@@ -23,8 +23,44 @@
 | `17_e231_shifted7s_control_uv_30s.mp4` | +7초 이동 대조군 | `outputs/review_exports/experiment231/therock/audio_orchestrated_30s_r1/therock_audio_orchestrated_30s_uv_2048_shifted7s_control.mp4` |
 | `18_e237_three_view_timeline_30s.mp4` | E237 30초 발표용 3시점+타임라인 영상 | 아래 E237 원본만 사용한 고정 카메라 오프라인 렌더; `PASS_PRESENTATION_RENDER_QA` |
 | `19_e237_three_view_poster.png` | 귀·눈 동시 시작 직후 포스터 | E237 frame 383, `t=15.958초`; 1920×1080 |
+| `20_kangaroo_msr_concept.png` | 캥거루 동일 시점의 원본·hard partition·soft MSR 비교 | `kangaroo_msr_intrinsic_v45`의 고정 `a045/elevation 0°` face-ID와 실제 필드만 사용; 1680×912 |
+| `21_kangaroo_msrg_roles.png` | 캥거루 MSRG 자동 역할과 인접 관계 | `automatic_role_assignment_v57/kangaroo/manifest.json`의 자동 역할·무방향 `region_graph`만 사용; 1800×750 |
 
 영상 16·17은 UV atlas 영상이므로 그 자체가 일반 카메라 영상처럼 보이지 않는다. Unity의 원본 메시 UV에 영상 텍스처로 적용한 뒤 3D 또는 실제 projector 결과를 발표 영상으로 보여 주는 것이 올바른 사용법이다.
+
+## 캥거루 MSR·MSRG 그림 재현 정보
+
+두 그림은 `발표자료/scripts/render_kangaroo_msr_figures.py`로 만들었다. 연구 저장소의 기존 캥거루 메시·face-ID·MSR 필드·자동 역할 manifest만 읽으며, 새로운 영역 분할이나 역할 추론을 실행하지 않는다.
+
+- 메시: `outputs/pipeline_runs/kangaroo_msr_intrinsic_v45/inputs/working/Kangaroo_v1_L3.obj`
+  - SHA-256: `A121EA93D25500EB5D9233708D5AC4E1C4D2B17E288244D394F1017AF379274B`
+- MSR 필드: `outputs/pipeline_runs/kangaroo_msr_intrinsic_v45/artifacts/msr/semantic_shadow/msrg_refined_fields.npz`
+  - SHA-256: `C7F49EEDE290DF20EEB113412222A2195D6579C7717EE1D6832ECB026AE20EA0`
+- 고정 시점 face-ID: `outputs/pipeline_runs/kangaroo_msr_intrinsic_v45/artifacts/neutral_views/view_a045_ez00/view_a045_ez00_face_id.png`
+  - 768×768, yaw 45°, elevation 0°
+  - SHA-256: `D11596E258F534335FEF6B1E7827A61758D96E4A091881269BE9106FBB9569A6`
+- 고정 시점 neutral RGB: `outputs/pipeline_runs/kangaroo_msr_intrinsic_v45/artifacts/neutral_views/view_a045_ez00/view_a045_ez00_neutral_rgb.png`
+  - SHA-256: `E12EE6F5E5204D0C37335FC9CC71424DCE7544E82D82ABA605EE5F63F103CC85`
+- 자동 역할 manifest: `outputs/evaluation/automatic_role_assignment_v57/kangaroo/manifest.json`
+  - SHA-256: `67DF2AC3C08992DF256ACB49FB8EEA46174FB2364E2FB8FF8FF5DF2F2F43B70F`
+
+### 20번 MSR 그림
+
+- 세 패널은 동일한 768×768 face-ID 렌더를 같은 crop·scale로 사용한다.
+- `원본`: OBJ에 저장된 정점 RGB를 면 단위로 평균하고 기존 neutral RGB의 명암만 곱했다.
+- `기존 부위 분할 (hard label)`: `region_labels`의 실제 13개 hard partition과 파이프라인의 기존 `REGION_COLORS`를 사용했다.
+- `MSR (core · band · halo)`: 실제 7개 `visual_semantic_parent_membership`을 기존 팔레트와 혼합했다. `soft_rgb = membership @ palette`, `opacity = 0.12 + 0.88 × max(membership)^1.7`, `display_rgb = (1−opacity) × 248 + opacity × soft_rgb`다. 이 opacity는 발표용 명암 표현이며 영역 판정을 바꾸지 않는다.
+- 중요한 한계: 이 run의 `resolved_config.json`은 provider가 `geometry_fallback`임을 명시한다. 따라서 **캥거루 PartField 기반 hard cut 근거는 없음**. 또한 v45에는 연속 membership과 entropy는 있지만 core/band/halo가 각각 확정된 별도 마스크는 없다. 그림의 진함·중간·옅음은 기존 연속 membership 강도를 보여 주는 표현이다.
+- 승인 상태: `artifacts/msr/editor/msr_editor_state.json`의 모든 영역이 `unreviewed`이며 `msr_approved.json`은 없다. 따라서 **사람이 승인한 MSR 근거는 없음**. 세 번째 패널은 자동 정제된 최종 제안이고 승인 결과로 제시하면 안 된다.
+- 결과 SHA-256: `FD2CC0B6AC878F8F5BFB7D8D238728B2A2134E10E9F15D1BEED261EBC30115CF`
+
+### 21번 MSRG 그림
+
+- 자동 역할은 저장된 v57 결과 그대로다: `head→Source`, `leg→Path`, `paired_appendage→Path`, `tail→Path`, `torso→Reservoir`, `small_detail→Modifier`, `foot→Sink`.
+- 노드는 고정 시점에서 각 semantic parent가 보이는 픽셀의 중심에 가장 가까운 실제 소유 픽셀에 놓았다. 역할 색도 v57 스크립트의 기존 색을 사용했다.
+- 실선은 manifest의 무방향 `region_graph` 인접 관계만 중복 없이 그린 것이다.
+- **semantic-parent 단위의 방향성 전달 엣지 근거는 없음**. 따라서 화살표를 만들지 않았다. Barrier는 v57에서 독립 노드가 아니라 `path_side_physical_geodesic_interface` 방식의 관계적 역할이므로 별도 노드로 만들지 않았다.
+- 결과 SHA-256: `C561236899B1D99FD90F2D7F0FCD02575D271CBC5248056BD0C47D5C0E8A6C7D`
 
 ## E237 3시점 발표 영상 재현 정보
 
@@ -47,4 +83,6 @@
 - 타임라인: E237 `result.json`의 전면·코·눈·귀·입·후면 사건 시작–종료를 그대로 사용하고, frame 287(`11.958초`)을 `사건 없음`으로 표시했다.
 - 포스터: frame 383, `15.958초`(귀·눈 동시 시작 frame 382 직후).
 - 인코딩: H.264 High@4.1, yuv420p, CRF 18, maxrate 8 Mbit/s, BT.709, faststart; AAC 48kHz stereo stream copy.
-- 결과 검증: 1920×1080, 24/1fps, 720프레임, 영상·오디오 모두 30.000초, 2,614,532 bytes. 입력/출력 AAC elementary-stream SHA-256가 `38695c2082f4b6df3c837590a4b4ff089027a7da823bd6a134c234a2f445e1e8`로 동일하다.
+- 타임라인 제목: `오디오 사건 타임라인`(기존 `E237 · 오디오 사건 타임라인`에서 발표용 문구만 수정, 사건·렌더 설정은 동일).
+- 결과 검증: 1920×1080, 24/1fps, 720프레임, 영상·오디오 모두 30.000초, 2,609,366 bytes. 입력/출력 AAC elementary-stream SHA-256가 `38695c2082f4b6df3c837590a4b4ff089027a7da823bd6a134c234a2f445e1e8`로 동일하다.
+- 결과 SHA-256: 영상 `66960E7E654F6DB39BBB460674FFBBB861A25282F1535FAA9FBF420A44451708`, 포스터 `167D1CBCB0ADD337AC8EF22A82A37584FCF0765FFE559EE82F9B43ACDDF9DD89`.
