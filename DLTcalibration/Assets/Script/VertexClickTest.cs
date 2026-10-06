@@ -152,6 +152,10 @@ public class VertexClickTest : MonoBehaviour
         {
             ToggleLiveSolve();
         }
+
+        // '[' / ']' 키: 십자선 크기 줄이기/키우기
+        if (Input.GetKeyDown(KeyCode.LeftBracket)) Marker.ChangeSize(-1);
+        if (Input.GetKeyDown(KeyCode.RightBracket)) Marker.ChangeSize(+1);
     }
 
     public bool AlignmentView => alignmentView;
@@ -394,6 +398,9 @@ public class VertexClickTest : MonoBehaviour
             tolerance = Mathf.Max(tolerance, meshRenderer.bounds.size.magnitude * 1e-3f);
 
         ClearSelection();
+
+        // 마커를 맞추는 동안은 텍스처 없이 모델 모양만 투사한다 (다 맞춘 뒤 X로 입힘)
+        if (TextureSequenceAnimator.Instance != null) TextureSequenceAnimator.Instance.SetTextureVisible(false);
 
         int selected = 0;
         foreach (Vector3 position in recommended)

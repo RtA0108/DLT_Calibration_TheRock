@@ -10,17 +10,19 @@
 
 ## 필요한 것
 - Unity **2022.3.8f1** (URP)
-- Windows x64 + **Visual Studio의 "C++를 사용한 데스크톱 개발"** 설치
-  - DLT 계산 DLL(`DLT_Rezero.dll`)과 OpenCV DLL이 디버그 빌드라서, Visual Studio가 설치하는 디버그 런타임(`MSVCP140D.dll`, `ucrtbased.dll` 등)이 있어야 합니다.
+- Git (저장소 받기, Unity의 MCP 패키지 받기)
 - 실제 테스트: 프로젝터 1대 (Unity의 Display 2로 출력)
 
+DLT 계산은 C# 코드(`DLT_solve.cs`)라서 OpenCV나 Visual Studio가 필요 없습니다.
+(예전에는 `DLT_Rezero.dll`을 썼는데, OpenCV DLL과 Visual Studio 디버그 런타임이 있는 PC에서만 동작해서 다른 PC에서는 보정이 안 됐습니다. 같은 식, 같은 풀이를 C#으로 옮겼고 결과 차이는 10⁻¹² 수준입니다.)
+
 ## 시작하기
-1. **처음 한 번:** `DLTcalibration/Assets/Plugin/opencv_world480d.zip`의 압축을 같은 폴더에 풉니다 → `opencv_world480d.dll`(126MB).
-   - GitHub는 100MB가 넘는 파일을 받지 않아서 압축본만 올려 두었습니다. 이 DLL이 없으면 보정 계산 때 `DllNotFoundException: DLT_Rezero.dll` 오류가 납니다.
-   - 압축을 풀기 전에 Unity를 열었다면, 풀고 나서 Unity를 다시 시작하세요.
-2. Unity Hub에서 `DLTcalibration` 폴더를 프로젝트로 엽니다. 처음 열 때는 패키지를 받고 가져오느라 몇 분 걸립니다.
-3. `Assets/Scenes/SampleScene`을 열고 플레이합니다.
-4. 오른쪽 목록에서 **TheRock**을 고르고 **R**(추천점으로 마커 만들기) → 프로젝터 화면에서 마커를 실물에 맞춥니다. 조작 화면에서 **H**를 누르면 도움말이 나옵니다.
+1. Unity Hub에서 `DLTcalibration` 폴더를 프로젝트로 엽니다. 처음 열 때는 패키지를 받고 가져오느라 몇 분 걸립니다.
+2. `Assets/Scenes/SampleScene`을 열고 플레이합니다.
+3. 오른쪽 목록에서 **TheRock**을 고르고 **R**(추천점으로 마커 만들기) → 프로젝터 화면에서 마커를 실물에 맞춥니다.
+   - 마커를 맞추는 동안은 텍스처 없이 모델 모양만 투사됩니다. 다 맞추면 **X**로 텍스처를 입힙니다.
+   - 십자선 크기는 **[ / ]** 키로 조절합니다.
+4. 조작 화면에서 **H**를 누르면 도움말이 나옵니다.
 
 자세한 순서는 [실제_프로젝터_테스트_방법.md](DLTcalibration/실제_프로젝터_테스트_방법.md),
 다른 실물을 쓰려면 [새_모델_추가_방법.md](DLTcalibration/새_모델_추가_방법.md)를 보세요.
@@ -35,10 +37,9 @@
 | `DLTcalibration/Assets/Resources/Result_CfS`, `Result_Tex` | TheRock saliency 결과 (미리 계산되어 있어 Python 없이 바로 사용) |
 | `DLTcalibration/Assets/Resources/DefaultLibrary.txt` | 모델 목록 |
 | `DLTcalibration/Assets/Editor/ModelImportWindow.cs` | 새 모델 추가 도구 (Unity 메뉴 Tools > 캘리브레이션 > 새 모델 추가) |
-| `DLTcalibration/Assets/Plugin/DLT_Rezero.dll` | DLT 계산 DLL (`opencv_world480d.dll`이 옆에 있어야 동작) |
-| `DLTcalibration/Assets/Plugin/opencv_world480d.zip` | OpenCV DLL 압축본 (처음 한 번 풀기) |
+| `DLTcalibration/Assets/Plugin/` | 예전 DLT DLL과 OpenCV 압축본 (지금은 쓰지 않음, 참고용) |
 | `DLTcalibration/PythonScripts/` | 새 모델의 saliency 계산 스크립트 |
-| `DLT_Rezero/` | `DLT_Rezero.dll`의 C++ 소스 (Visual Studio 프로젝트) |
+| `DLT_Rezero/` | 예전 `DLT_Rezero.dll`의 C++ 소스 (참고용, C# 코드와 같은 식) |
 | `Docs/` | 원본 저장소에서 작업한 수정 내역 기록 |
 
 ## 원본에서 뺀 것

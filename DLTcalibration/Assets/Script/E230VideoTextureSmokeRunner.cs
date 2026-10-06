@@ -91,6 +91,9 @@ public class E230VideoTextureSmokeRunner : MonoBehaviour
 
         GameObject model = RuntimeMeshLoader.Instance.CurrentLoadedObject;
         TextureSequenceAnimator animator = TextureSequenceAnimator.Instance;
+        // 모델은 텍스처를 끈 상태로 불러와지므로(마커 맞추기용) 여기서 입힌다 (X 키와 같음)
+        if (animator != null) animator.SetTextureVisible(true);
+        yield return null;
         if (model == null)
         {
             Fail("TheRock 모델 로드에 실패했습니다.");

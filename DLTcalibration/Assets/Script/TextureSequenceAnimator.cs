@@ -15,6 +15,10 @@ using UnityEngine.Video;
 //      mp4/mov/webm 비디오는 StreamingAssets 기준 경로(예: "StreamingAssets/VideoTextures/MyAnim.mp4")도 가능.
 // 재생 순서는 파일 이름 순서(숫자는 크기 순: frame_2 < frame_10). 속도는 "animatedTextureFps"(없으면 defaultFps).
 // 시퀀스가 없는 모델은 원래 텍스처를 그대로 쓴다.
+//
+// 텍스처 끄기/입히기 (X 키): 마커를 맞출 때는 텍스처 없이 흰 모델 모양만 투사하고, 다 맞춘 뒤 텍스처를 입힌다.
+// (리허설: 텍스처가 입혀진 채로는 실물의 점을 찾기 어려웠음) 모델을 불러오거나 R을 누르면 꺼진 상태가 된다.
+// 끈 동안 비디오는 일시정지한다. 재질은 바꾸지 않고 텍스처만 흰색으로 바꿔서, 히트맵(2)과 겹쳐도 상태가 유지된다.
 public class TextureSequenceAnimator : MonoBehaviour
 {
     public static TextureSequenceAnimator Instance;
@@ -24,9 +28,14 @@ public class TextureSequenceAnimator : MonoBehaviour
     public float defaultFps = 24f;
     public bool playing = true;                  // P 키로 재생/일시정지
 
+    [Header("Texture On/Off")]
+    public bool hideTextureOnLoad = true;        // 모델을 불러올 때 텍스처를 끈 상태로 시작
+    public bool TextureVisible { get; private set; } = true;
+
     private Texture2D[] frames;
     private float fps;
     private readonly List<Material> targetMaterials = new List<Material>();
+    private readonly Dictionary<Material, Texture> staticTextures = new Dictionary<Material, Texture>(); // 모델 원래 텍스처
     private float timer;
     private int currentFrame;
     private VideoPlayer videoPlayer;
@@ -43,23 +52,58 @@ public class TextureSequenceAnimator : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.P) && !HotkeyGuard.Blocked) TogglePlaying();
+        if (!HotkeyGuard.Blocked)
+        {
+            if (Input.GetKeyDown(KeyCode.P)) TogglePlaying();
+            if (Input.GetKeyDown(KeyCode.X)) ToggleTextureVisible();
+        }
 
         if (IsVideoMode)
         {
             // 일부 플랫폼은 Prepare 완료 직후 첫 Update에서 texture를 만든다.
-            if (videoReady && videoPlayer.texture != null) ApplyVideoTexture();
+            if (videoReady && videoPlayer.texture != null) ApplyTextures();
             return;
         }
 
-        if (!playing || frames == null || frames.Length == 0 || targetMaterials.Count == 0) return;
+        if (!playing || !TextureVisible || frames == null || frames.Length == 0 || targetMaterials.Count == 0) return;
 
         timer += Time.deltaTime;
         float frameTime = 1f / fps;
         if (timer < frameTime) return;
         timer %= frameTime;
         currentFrame = (currentFrame + 1) % frames.Length;
-        foreach (Material m in targetMaterials) if (m != null) m.mainTexture = frames[currentFrame];
+        ApplyTextures();
+    }
+
+    public bool HasModel => targetMaterials.Count > 0;
+
+    public void ToggleTextureVisible() => SetTextureVisible(!TextureVisible);
+
+    public void SetTextureVisible(bool visible)
+    {
+        bool changed = TextureVisible != visible;
+        TextureVisible = visible;
+        ApplyTextures();
+        if (IsVideoReady)
+        {
+            if (visible && playing) videoPlayer.Play();
+            else videoPlayer.Pause();
+        }
+        if (changed && HasModel) Debug.Log($"[Texture] {(visible ? "텍스처 입힘" : "텍스처 끔 (모델 모양만 투사)")}");
+    }
+
+    // 재질마다 지금 보여야 할 텍스처를 넣는다. 텍스처를 끈 동안은 흰색(재질 색 그대로의 흰 모델).
+    private void ApplyTextures()
+    {
+        foreach (Material m in targetMaterials)
+        {
+            if (m == null) continue;
+            Texture shown = !TextureVisible ? Texture2D.whiteTexture
+                          : IsVideoReady && videoPlayer.texture != null ? videoPlayer.texture
+                          : frames != null && frames.Length > 0 ? frames[currentFrame]
+                          : staticTextures.TryGetValue(m, out Texture original) ? original : null;
+            if (m.mainTexture != shown) m.mainTexture = shown;
+        }
     }
 
     public bool HasSequence => IsVideoMode ? videoReady : frames != null && frames.Length > 0;
@@ -76,7 +120,7 @@ public class TextureSequenceAnimator : MonoBehaviour
         playing = !playing;
         if (IsVideoMode)
         {
-            if (playing) videoPlayer.Play();
+            if (playing && TextureVisible) videoPlayer.Play();
             else videoPlayer.Pause();
         }
         Debug.Log($"[4D Texture] {(playing ? "재생" : "일시정지")}");
@@ -90,9 +134,15 @@ public class TextureSequenceAnimator : MonoBehaviour
         // 이전 모델용으로 만든 재질 복사본(r.material)은 모델이 지워져도 남으므로 정리
         foreach (Material m in targetMaterials) if (m != null) Destroy(m);
         targetMaterials.Clear();
+        staticTextures.Clear();
         timer = 0f;
         currentFrame = 0;
+        TextureVisible = !hideTextureOnLoad;
         if (model == null || entry == null) return;
+
+        // 4D 텍스처가 없는 모델도 텍스처를 끄고 켤 수 있게 재질은 항상 모은다
+        CollectTargetMaterials(model);
+        if (targetMaterials.Count == 0) return;
 
         string source = !string.IsNullOrEmpty(entry.animatedTexturePath)
             ? entry.animatedTexturePath
@@ -100,8 +150,7 @@ public class TextureSequenceAnimator : MonoBehaviour
 
         if (IsVideoSource(source))
         {
-            CollectTargetMaterials(model);
-            if (targetMaterials.Count == 0) return;
+            ApplyTextures();
             StartVideo(source, entry.id);
             return;
         }
@@ -111,14 +160,13 @@ public class TextureSequenceAnimator : MonoBehaviour
         {
             if (!string.IsNullOrEmpty(entry.animatedTexturePath))
                 Debug.LogWarning($"[4D Texture] '{entry.animatedTexturePath}'에서 이미지를 찾지 못했습니다.");
+            ApplyTextures();
             return;
         }
 
-        CollectTargetMaterials(model);
-        if (targetMaterials.Count == 0) return;
         frames = sequence;
         fps = entry.animatedTextureFps > 0f ? entry.animatedTextureFps : defaultFps;
-        foreach (Material m in targetMaterials) m.mainTexture = frames[0];
+        ApplyTextures();
         Debug.Log($"[4D Texture] {entry.id}: {frames.Length}장, {fps}fps ({source})");
     }
 
@@ -126,7 +174,12 @@ public class TextureSequenceAnimator : MonoBehaviour
     {
         // 모델 자체의 렌더러만 (모델 아래에 붙는 버텍스 구/추천 마커는 레이어가 달라서 제외)
         foreach (Renderer renderer in model.GetComponentsInChildren<Renderer>())
-            if (renderer.gameObject.layer == model.layer) targetMaterials.Add(renderer.material);
+        {
+            if (renderer.gameObject.layer != model.layer) continue;
+            Material m = renderer.material;
+            targetMaterials.Add(m);
+            staticTextures[m] = m.mainTexture;
+        }
     }
 
     private static bool IsVideoSource(string source)
@@ -178,8 +231,8 @@ public class TextureSequenceAnimator : MonoBehaviour
     private void OnVideoPrepared(VideoPlayer player)
     {
         videoReady = true;
-        ApplyVideoTexture();
-        if (playing) player.Play();
+        ApplyTextures();
+        if (playing && TextureVisible) player.Play();
 
         double duration = player.frameRate > 0.0 ? player.frameCount / player.frameRate : 0.0;
         Debug.Log($"[4D Texture Video] 준비 완료: {player.width}x{player.height}, " +
@@ -190,14 +243,6 @@ public class TextureSequenceAnimator : MonoBehaviour
     {
         videoReady = false;
         Debug.LogError($"[4D Texture Video] 재생 오류 ({videoSource}): {message}");
-    }
-
-    private void ApplyVideoTexture()
-    {
-        if (videoPlayer == null || videoPlayer.texture == null) return;
-        foreach (Material material in targetMaterials)
-            if (material != null && material.mainTexture != videoPlayer.texture)
-                material.mainTexture = videoPlayer.texture;
     }
 
     private void ResetVideo()

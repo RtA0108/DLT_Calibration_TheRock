@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
 using UnityEngine;
 
 // 대응점(3D 버텍스 <-> 프로젝터 2D 픽셀)으로 DLT를 풀어 프로젝터 카메라(projCam)에 적용한다.
@@ -12,14 +11,6 @@ using UnityEngine;
 // K(fx, fy, skew, cx, cy)는 projCam.projectionMatrix로 그대로 옮길 수 있다.
 public class DLT_solve : MonoBehaviour
 {
-
-    #region --- DLL Imports ---
-    [DllImport("DLT_Rezero.dll", EntryPoint = "DLT")]
-    private static extern void DLT(double[] worldPoints, double[] imagePoints, int numPoints, double[] projectionMatrix);
-
-    [DllImport("DLT_Rezero.dll", EntryPoint = "projectPoints")]
-    private static extern void projectPoints(double[] worldPoints, double[] projectionMatrix, double[] rtMatrix, double[] resultPoints, float camPos);
-    #endregion
     // 다른 마커들과 유독 안 맞는 마커 찾기: 가장 크게 어긋난 마커 하나만, 나머지 마커들의 중앙값보다
     // 3배 이상이고 6px 이상일 때. 점 8개 미만이면 판별이 안 돼서 찾지 않는다.
     // (예전에는 마커끼리 3px만 어긋나도 경고했는데, 손 오차 때문에 실제로는 거의 항상 떴을 것.
@@ -280,8 +271,8 @@ public class DLT_solve : MonoBehaviour
 
     #region --- Math & Calibration Logic ---
 
-    // Hartley 정규화를 거쳐 DLL의 DLT를 호출하고, 원래 좌표계의 3x4 투영 행렬 P를 돌려준다 (row-major 12개).
-    // DLL은 P[2,3] = 1로 고정한 11-파라미터 최소제곱이라, 정규화 없이 넣으면 좌표 크기 차이 때문에 수치적으로 불안정하다.
+    // Hartley 정규화를 거쳐 11-파라미터 DLT를 풀고, 원래 좌표계의 3x4 투영 행렬 P를 돌려준다 (row-major 12개).
+    // P[2,3] = 1로 고정한 최소제곱이라, 정규화 없이 넣으면 좌표 크기 차이 때문에 수치적으로 불안정하다.
     private static double[] SolveDLT(List<Vector3> world, List<Vector2> image)
     {
         int n = world.Count;
@@ -314,8 +305,7 @@ public class DLT_solve : MonoBehaviour
             imagePoints[i * 2 + 1] = (image[i].y - c2y) * s2;
         }
 
-        double[] L = new double[11];
-        DLT(worldPoints, imagePoints, n, L);
+        double[] L = SolveDLT11(worldPoints, imagePoints, n);
         double[,] Pn =
         {
             { L[0], L[1], L[2],  L[3] },
@@ -340,6 +330,93 @@ public class DLT_solve : MonoBehaviour
             P[8 + j] = A[2, j];
         }
         return P;
+    }
+
+    // 11-파라미터 DLT: 점마다 아래 두 식을 세워 최소제곱으로 푼다 (P[2,3] = 1 고정).
+    //   u = (L0 X + L1 Y + L2 Z + L3) / (L8 X + L9 Y + L10 Z + 1),  v = (L4 X + L5 Y + L6 Z + L7) / (같은 분모)
+    // 예전 DLT_Rezero.dll(OpenCV cv::solve, DECOMP_SVD)과 같은 식, 같은 풀이(SVD 최소제곱)다.
+    // DLL은 OpenCV DLL(126MB, git에는 압축본만)과 Visual Studio 디버그 런타임이 있어야 해서,
+    // 다른 PC에서는 "DLT_Rezero.dll을 찾을 수 없음"으로 보정이 아예 안 됐다. C#으로 옮겨 그 의존을 없앴다.
+    private static double[] SolveDLT11(double[] world, double[] image, int n)
+    {
+        const int cols = 11;
+        int rows = 2 * n;
+        var a = new double[rows, cols];
+        var k = new double[rows];
+        for (int i = 0; i < n; i++)
+        {
+            double X = world[3 * i], Y = world[3 * i + 1], Z = world[3 * i + 2];
+            double u = image[2 * i], v = image[2 * i + 1];
+            int r = 2 * i;
+            a[r, 0] = X; a[r, 1] = Y; a[r, 2] = Z; a[r, 3] = 1.0;
+            a[r, 8] = -u * X; a[r, 9] = -u * Y; a[r, 10] = -u * Z;
+            k[r] = u;
+            a[r + 1, 4] = X; a[r + 1, 5] = Y; a[r + 1, 6] = Z; a[r + 1, 7] = 1.0;
+            a[r + 1, 8] = -v * X; a[r + 1, 9] = -v * Y; a[r + 1, 10] = -v * Z;
+            k[r + 1] = v;
+        }
+
+        // 한쪽 Jacobi SVD: 열끼리 직교가 될 때까지 열 쌍을 회전한다. 끝나면 a = U·S, V는 회전을 모은 것.
+        var V = new double[cols, cols];
+        for (int i = 0; i < cols; i++) V[i, i] = 1.0;
+        for (int sweep = 0; sweep < 60; sweep++)
+        {
+            double worst = 0.0;
+            for (int p = 0; p < cols - 1; p++)
+            {
+                for (int q = p + 1; q < cols; q++)
+                {
+                    double alpha = 0, beta = 0, gamma = 0;
+                    for (int i = 0; i < rows; i++)
+                    {
+                        alpha += a[i, p] * a[i, p];
+                        beta += a[i, q] * a[i, q];
+                        gamma += a[i, p] * a[i, q];
+                    }
+                    if (alpha == 0.0 || beta == 0.0 || gamma == 0.0) continue;
+                    worst = Math.Max(worst, Math.Abs(gamma) / Math.Sqrt(alpha * beta));
+
+                    double zeta = (beta - alpha) / (2.0 * gamma);
+                    double t = (zeta >= 0 ? 1.0 : -1.0) / (Math.Abs(zeta) + Math.Sqrt(1.0 + zeta * zeta));
+                    double c = 1.0 / Math.Sqrt(1.0 + t * t), s = c * t;
+                    for (int i = 0; i < rows; i++)
+                    {
+                        double ap = a[i, p], aq = a[i, q];
+                        a[i, p] = c * ap - s * aq;
+                        a[i, q] = s * ap + c * aq;
+                    }
+                    for (int i = 0; i < cols; i++)
+                    {
+                        double vp = V[i, p], vq = V[i, q];
+                        V[i, p] = c * vp - s * vq;
+                        V[i, q] = s * vp + c * vq;
+                    }
+                }
+            }
+            if (worst < 1e-15) break;
+        }
+
+        // x = V S⁺ Uᵀ k. 아주 작은 특이값은 버린다 (OpenCV와 같은 기준: 2·ε·특이값 합)
+        var sigma = new double[cols];
+        double sigmaSum = 0;
+        for (int j = 0; j < cols; j++)
+        {
+            double sq = 0;
+            for (int i = 0; i < rows; i++) sq += a[i, j] * a[i, j];
+            sigma[j] = Math.Sqrt(sq);
+            sigmaSum += sigma[j];
+        }
+        double threshold = 2.0 * 2.220446049250313e-16 * sigmaSum;
+        var L = new double[cols];
+        for (int j = 0; j < cols; j++)
+        {
+            if (sigma[j] <= threshold) continue;
+            double dot = 0;
+            for (int i = 0; i < rows; i++) dot += a[i, j] * k[i];
+            double coef = dot / (sigma[j] * sigma[j]); // (a_j/σ)·k / σ
+            for (int i = 0; i < cols; i++) L[i] += coef * V[i, j];
+        }
+        return L;
     }
 
     // P = λK[R | -RC]를 분해한다 (RQ 분해를 Gram-Schmidt로 풀어 쓴 것).

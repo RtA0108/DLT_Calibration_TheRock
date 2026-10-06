@@ -36,14 +36,15 @@ public class CalibrationHUD : MonoBehaviour
         "1. 오른쪽 목록에서 모델 선택 (프로젝터 화면에 맞게 크기가 자동 조정됨)\n" +
         "2. <b>- / =</b> 추천점 개수 조절 (6~20, 기본 12) → <b>R</b> 추천점을 대응점으로 선택\n" +
         "     (조작 화면에서 <b>Ctrl+클릭</b>으로 버텍스를 직접 고르거나 해제할 수도 있음. 노란 점이 고를 점)\n" +
-        "3. 프로젝터 화면에서 각 십자선을 실물의 같은 위치로 드래그\n" +
+        "3. 프로젝터 화면에서 각 십자선을 실물의 같은 위치로 드래그 (이때는 텍스처 없이 모델 모양만 투사됨)\n" +
         "     조작 화면의 번호가 그 마커의 버텍스. 지금 움직이는 마커는 노란색\n" +
         "     <b>방향키</b> 마지막으로 누르거나 끈 마커를 1px씩 (Shift: 10px)\n" +
-        "     <b>V</b> 정렬 보기: 모델 없이 마커만 투사\n" +
+        "     <b>V</b> 정렬 보기: 모델 없이 마커만 투사   <b>[ / ]</b> 십자선 크기 줄이기/키우기\n" +
         "4. 마커를 6개 이상 맞추면, 놓을 때마다 맞춘 마커들로 자동 보정됨 (초록 = 맞춘 마커)\n" +
         "     빨강 = 다른 마커들과 유독 안 맞는 마커 (8개 이상 맞췄을 때) → 그 마커를 다시 확인\n" +
         "     계산이 깨진 결과(좌우 뒤집힘 등)는 적용하지 않고 '보정 보류'로 알림 → 마커 짝 확인\n" +
         "     <b>L</b> 자동 보정 켜기/끄기, <b>F</b> 맞춘 마커로 지금 계산, <b>Backspace</b> 보정 초기화\n" +
+        "5. 다 맞추면 <b>X</b>로 텍스처 입히기 (다시 누르면 끔. 모델을 바꾸거나 R을 누르면 다시 꺼짐)\n" +
         "\n" +
         "<b>기타</b>\n" +
         "<b>1</b> 캘리브레이션 모드   <b>2</b> 히트맵   <b>3</b> 추천점 표시   (R을 누르면 1, 3은 자동으로 켜짐)\n" +
@@ -158,6 +159,9 @@ public class CalibrationHUD : MonoBehaviour
             (() => $"자동 보정 (L): {(clickTest.liveSolve ? "켜짐" : "꺼짐")}", () => clickTest.ToggleLiveSolve()),
             (() => "보정 계산 (F)", () => dltSolver.PerformDLT()),
             (() => "보정 초기화 (Backspace)", () => dltSolver.ResetCalibration()),
+            (() => Animator4D == null || !Animator4D.HasModel ? "텍스처 (X): 모델 없음"
+                                                              : $"텍스처 (X): {(Animator4D.TextureVisible ? "입힘" : "끔 (모양만)")}",
+             () => { if (Animator4D != null) Animator4D.ToggleTextureVisible(); }),
             (() => Animator4D == null || !Animator4D.HasSequence ? "4D 텍스처: 없음"
                                                                 : $"4D 텍스처 (P): {(Animator4D.playing ? "재생 중" : "정지")}",
              () => { if (Animator4D != null) Animator4D.TogglePlaying(); }),
@@ -202,6 +206,8 @@ public class CalibrationHUD : MonoBehaviour
                 return $"<b>보정 보류:</b> {dltSolver.LastRejectReason}\n번호를 다른 곳에 맞춘 마커가 있는지 확인 ({placed}/{selected})";
             if (dltSolver != null && dltSolver.SuspectSlot >= 0)
                 return $"<b>확인:</b> {dltSolver.SuspectSlot + 1}번 마커(빨간색)가 다른 마커와 안 맞음\n맞춘 마커 {placed}/{selected}개";
+            if (placed >= selected && Animator4D != null && Animator4D.HasModel && !Animator4D.TextureVisible)
+                return $"<b>다음:</b> 다 맞췄으면 <b>X</b>로 텍스처 입히기 ({placed}/{selected})";
             if (!clickTest.liveSolve) return $"맞춘 마커 {placed}/{selected}개 · <b>F</b>로 보정";
             return $"자동 보정 중 · 맞춘 마커 {placed}/{selected}개";
         }));
@@ -212,7 +218,7 @@ public class CalibrationHUD : MonoBehaviour
     // ---------------------------------------------------------------- 도움말 창
     private void BuildHelpPanel()
     {
-        RectTransform panel = NewRect("HelpPanel", transform, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(580f, 430f));
+        RectTransform panel = NewRect("HelpPanel", transform, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(600f, 460f));
         panel.gameObject.AddComponent<Image>().color = new Color(0f, 0f, 0f, 0.96f);
         panel.gameObject.AddComponent<Button>().onClick.AddListener(ToggleHelp); // 아무 곳이나 클릭하면 닫힘
 
