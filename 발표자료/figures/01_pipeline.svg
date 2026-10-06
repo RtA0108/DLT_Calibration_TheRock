@@ -1,31 +1,133 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900">
   <defs>
     <style>
-      .bg{fill:#0b1220}.box{fill:#17243a;stroke:#58c4dc;stroke-width:3}.gen{fill:#2a2040;stroke:#c792ea;stroke-width:3}.out{fill:#17362f;stroke:#63d49d;stroke-width:3}.txt{fill:#f4f7fb;font-family:'Malgun Gothic','Noto Sans KR',sans-serif;font-size:27px;font-weight:700;text-anchor:middle}.sub{fill:#b9c8dd;font-family:'Malgun Gothic','Noto Sans KR',sans-serif;font-size:19px;text-anchor:middle}.arrow{stroke:#8aa4c7;stroke-width:5;fill:none;marker-end:url(#m)}.note{fill:#ffd580;font-family:'Malgun Gothic','Noto Sans KR',sans-serif;font-size:21px;font-weight:700;text-anchor:middle}
+      .bg{fill:#09111f}
+      .panel{fill:#101a2b;stroke:#334155;stroke-width:2}
+      .event{fill:#261d3b;stroke:#c084fc;stroke-width:3}
+      .audio{fill:#102b3d;stroke:#38bdf8;stroke-width:3}
+      .spatial{fill:#19283a;stroke:#60a5fa;stroke-width:3}
+      .compose{fill:#332a15;stroke:#fbbf24;stroke-width:3}
+      .output{fill:#12352f;stroke:#34d399;stroke-width:3}
+      .downstream{fill:#0f1827;stroke:#475569;stroke-width:2;stroke-dasharray:9 7}
+      .downbox{fill:#172235;stroke:#64748b;stroke-width:2}
+      .title{fill:#f8fafc;font-family:'Malgun Gothic','Noto Sans KR',sans-serif;font-size:34px;font-weight:800;text-anchor:middle}
+      .subtitle{fill:#a9bdd4;font-family:'Malgun Gothic','Noto Sans KR',sans-serif;font-size:18px;text-anchor:middle}
+      .section{fill:#7dd3fc;font-family:'Malgun Gothic','Noto Sans KR',sans-serif;font-size:18px;font-weight:800;letter-spacing:1px}
+      .head{fill:#f8fafc;font-family:'Malgun Gothic','Noto Sans KR',sans-serif;font-size:23px;font-weight:800;text-anchor:middle}
+      .body{fill:#cbd5e1;font-family:'Malgun Gothic','Noto Sans KR',sans-serif;font-size:17px;text-anchor:middle}
+      .small{fill:#94a3b8;font-family:'Malgun Gothic','Noto Sans KR',sans-serif;font-size:15px;text-anchor:middle}
+      .accent{fill:#fde68a;font-family:'Malgun Gothic','Noto Sans KR',sans-serif;font-size:16px;font-weight:800;text-anchor:middle}
+      .green{fill:#6ee7b7;font-family:'Malgun Gothic','Noto Sans KR',sans-serif;font-size:16px;font-weight:800;text-anchor:middle}
+      .arrow{stroke:#94a3b8;stroke-width:4;fill:none;marker-end:url(#arrow)}
+      .eventArrow{stroke:#c084fc;stroke-width:4;fill:none;marker-end:url(#arrowEvent)}
+      .audioArrow{stroke:#38bdf8;stroke-width:4;fill:none;marker-end:url(#arrowAudio)}
+      .outArrow{stroke:#34d399;stroke-width:4;fill:none;marker-end:url(#arrowOut)}
     </style>
-    <marker id="m" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M0,0 L12,6 L0,12 z" fill="#8aa4c7"/></marker>
+    <marker id="arrow" markerWidth="11" markerHeight="11" refX="9" refY="5.5" orient="auto"><path d="M0,0 L11,5.5 L0,11 z" fill="#94a3b8"/></marker>
+    <marker id="arrowEvent" markerWidth="11" markerHeight="11" refX="9" refY="5.5" orient="auto"><path d="M0,0 L11,5.5 L0,11 z" fill="#c084fc"/></marker>
+    <marker id="arrowAudio" markerWidth="11" markerHeight="11" refX="9" refY="5.5" orient="auto"><path d="M0,0 L11,5.5 L0,11 z" fill="#38bdf8"/></marker>
+    <marker id="arrowOut" markerWidth="11" markerHeight="11" refX="9" refY="5.5" orient="auto"><path d="M0,0 L11,5.5 L0,11 z" fill="#34d399"/></marker>
   </defs>
+
   <rect class="bg" width="1600" height="900"/>
-  <text class="txt" x="800" y="62" font-size="36">MSR/MSRG 기반 오디오 반응형 프로젝션 매핑</text>
-  <rect class="box" x="45" y="150" rx="22" width="240" height="150"/>
-  <text class="txt" x="165" y="205">입력</text><text class="sub" x="165" y="245">Mesh + UV + base</text><text class="sub" x="165" y="275">30 s audio + style</text>
-  <rect class="box" x="340" y="150" rx="22" width="260" height="150"/>
-  <text class="txt" x="470" y="200">표면 관찰</text><text class="sub" x="470" y="240">PartField hierarchy</text><text class="sub" x="470" y="270">24-view DINO + SAM2</text>
-  <rect class="box" x="655" y="150" rx="22" width="260" height="150"/>
-  <text class="txt" x="785" y="200">Editable MSRG</text><text class="sub" x="785" y="240">core / band / halo</text><text class="sub" x="785" y="270">role + graph + owner</text>
-  <rect class="box" x="970" y="150" rx="22" width="260" height="150"/>
-  <text class="txt" x="1100" y="200">오디오 계획</text><text class="sub" x="1100" y="240">5 control lanes</text><text class="sub" x="1100" y="270">start / overlap / hold</text>
-  <rect class="gen" x="1285" y="150" rx="22" width="270" height="150"/>
-  <text class="txt" x="1420" y="200">생성</text><text class="sub" x="1420" y="240">FLUX peak states</text><text class="sub" x="1420" y="270">LTX 145-frame motion</text>
-  <path class="arrow" d="M285 225H332"/><path class="arrow" d="M600 225H647"/><path class="arrow" d="M915 225H962"/><path class="arrow" d="M1230 225H1277"/>
-  <rect class="gen" x="260" y="465" rx="22" width="320" height="165"/>
-  <text class="txt" x="420" y="515">다중 시점 → UV</text><text class="sub" x="420" y="555">face ID + barycentric</text><text class="sub" x="420" y="585">visibility/facing/Huber fusion</text>
-  <rect class="box" x="640" y="465" rx="22" width="320" height="165"/>
-  <text class="txt" x="800" y="515">통합·보정</text><text class="sub" x="800" y="555">exclusive owner + handoff</text><text class="sub" x="800" y="585">seam / 3D fill / gutter</text>
-  <rect class="out" x="1020" y="465" rx="22" width="320" height="165"/>
-  <text class="txt" x="1180" y="515">최종 출력</text><text class="sub" x="1180" y="555">2048² × 720 frames</text><text class="sub" x="1180" y="585">H.264 + AAC / Unity</text>
-  <path class="arrow" d="M1420 300V380H420V457"/><path class="arrow" d="M580 548H632"/><path class="arrow" d="M960 548H1012"/>
-  <text class="note" x="800" y="732">사람 개입: MSR 수락·병합·계층 분할·역할 수정 / 사건 brief·prompt / 후보 선택 / 최종 미학 veto</text>
-  <text class="sub" x="800" y="785">완료 근거: E86 후보 용량 · E222 UV 소유권 · E227 soft fusion · E230 30 s · E231 audio scheduling</text>
-  <text class="sub" x="800" y="825">미완료: 독립 지각·저작 사용자 평가, cross-mesh 생성 일반화, 실제 projector 최종 평가</text>
+  <text class="title" x="800" y="48">오디오 조건 Mesh Semantic Region 비디오 텍스처 생성 파이프라인</text>
+  <text class="subtitle" x="800" y="78">연구 본체는 UV 비디오 텍스처 생성까지이며, WebGL·Unity·프로젝터는 검증과 적용 단계다</text>
+
+  <text class="section" x="42" y="108">입력 및 사전 제작 자산</text>
+  <rect class="panel" x="40" y="120" rx="18" width="1520" height="128"/>
+  <line x1="420" y1="120" x2="420" y2="248" stroke="#334155" stroke-width="2"/>
+  <line x1="800" y1="120" x2="800" y2="248" stroke="#334155" stroke-width="2"/>
+  <line x1="1180" y1="120" x2="1180" y2="248" stroke="#334155" stroke-width="2"/>
+
+  <text class="head" x="230" y="158">공간 입력</text>
+  <text class="body" x="230" y="190">고정 mesh + UV</text>
+  <text class="body" x="230" y="216">MSR + owner / 보호 영역</text>
+
+  <text class="head" x="610" y="158">저작 입력</text>
+  <text class="body" x="610" y="190">사용자 prompt + mesh/audio 특징 기술</text>
+  <text class="small" x="610" y="218">부위별 사건 문법 · 재질 · 금지 조건</text>
+
+  <text class="head" x="990" y="158">기본 appearance</text>
+  <text class="body" x="990" y="190">프롬프트로 제작·선정된 기본 texture</text>
+  <text class="small" x="990" y="218">사건 이전의 물체 전체 surface 재질</text>
+
+  <text class="head" x="1370" y="158">시간 입력</text>
+  <text class="body" x="1370" y="190">audio file</text>
+  <text class="small" x="1370" y="218">파형 · 주파수 · 구간 구조</text>
+
+  <path class="arrow" d="M800 248V281"/>
+
+  <text class="section" x="42" y="299">연구 핵심 생성·합성</text>
+  <rect class="panel" x="40" y="310" rx="22" width="1520" height="340"/>
+  <text class="small" x="250" y="338">사건 source 준비</text>
+  <text class="small" x="635" y="338">고정 표면에 공간 등록</text>
+  <text class="small" x="250" y="514">오디오에서 편성 근거 추출</text>
+  <text class="small" x="635" y="514">사건의 시간 배치 결정</text>
+
+  <rect class="event" x="80" y="350" rx="18" width="330" height="140"/>
+  <text class="head" x="245" y="383">부위별 사건 source 생성</text>
+  <text class="body" x="245" y="417">정적 peak 후보 → temporal RGB</text>
+  <text class="body" x="245" y="445">pretrained image/video generation</text>
+  <text class="accent" x="245" y="473">길이: 저작자 지정 (오디오 추론 아님)</text>
+
+  <rect class="spatial" x="470" y="350" rx="18" width="330" height="140"/>
+  <text class="head" x="635" y="383">3D/UV 등록·공간 검증</text>
+  <text class="body" x="635" y="417">RGB source → 고정 mesh UV</text>
+  <text class="body" x="635" y="445">owner · 보호 영역 · 경계 검사</text>
+  <text class="accent" x="635" y="473">geometry는 바꾸지 않음</text>
+
+  <rect class="audio" x="80" y="526" rx="18" width="330" height="100"/>
+  <text class="head" x="245" y="558">계층적 오디오 분석</text>
+  <text class="body" x="245" y="588">micro / meso / macro 특징</text>
+  <text class="small" x="245" y="613">raw audio latent를 LTX에 직접 입력하지 않음</text>
+
+  <rect class="audio" x="470" y="526" rx="18" width="330" height="100"/>
+  <text class="head" x="635" y="558">오디오 사건 편성</text>
+  <text class="body" x="635" y="588">종류 · 시작 · 중첩 · 생략(빈 trigger)</text>
+  <text class="small" x="635" y="613">source 길이·내부 motion은 결정하지 않음</text>
+
+  <rect class="compose" x="875" y="397" rx="20" width="300" height="172"/>
+  <text class="head" x="1025" y="430">지속형 UV 합성</text>
+  <text class="body" x="1025" y="464">기본 texture 위에</text>
+  <text class="body" x="1025" y="490">등록된 사건을 원속도 합성</text>
+  <text class="body" x="1025" y="516">상태 유지 · 동시 사건 허용</text>
+  <text class="accent" x="1025" y="548">기본 재질과 표면 위치 보존</text>
+
+  <rect class="output" x="1235" y="397" rx="20" width="285" height="172"/>
+  <text class="head" x="1377" y="430">최종 연구 산출물</text>
+  <text class="body" x="1377" y="466">오디오 길이의 UV 비디오 텍스처</text>
+  <text class="body" x="1377" y="492">영상/프레임 + 동기 오디오</text>
+  <text class="body" x="1377" y="518">사건 시간표 · provenance · QA</text>
+  <text class="green" x="1377" y="548">원본 mesh UV에 직접 적용</text>
+
+  <path class="eventArrow" d="M410 420H462"/>
+  <path class="audioArrow" d="M410 576H462"/>
+  <path class="eventArrow" d="M800 420H835Q855 420 875 448"/>
+  <path class="audioArrow" d="M800 576H835Q855 576 875 535"/>
+  <path class="outArrow" d="M1175 483H1227"/>
+
+  <text class="accent" x="800" y="637">오디오가 결정하는 것: 사건 종류·시작·중첩·생략　|　사전 설정되는 것: 사건 source 길이·내부 motion</text>
+
+  <path class="outArrow" d="M1377 569V676"/>
+  <rect class="downstream" x="40" y="680" rx="22" width="1520" height="180"/>
+  <text class="section" x="62" y="710">후단 검증·적용 — 생성 파이프라인과 구분</text>
+
+  <rect class="downbox" x="90" y="730" rx="16" width="420" height="100"/>
+  <text class="head" x="300" y="766">WebGL 3D viewer</text>
+  <text class="body" x="300" y="796">다각도 시각 확인·QA 전용</text>
+  <text class="small" x="300" y="820">최종 연구 결과물 자체가 아님</text>
+
+  <rect class="downbox" x="590" y="730" rx="16" width="420" height="100"/>
+  <text class="head" x="800" y="766">Unity 재생</text>
+  <text class="body" x="800" y="796">원본 mesh material에 비디오 적용</text>
+  <text class="small" x="800" y="820">재생·동기·장비 연결 검증</text>
+
+  <rect class="downbox" x="1090" y="730" rx="16" width="420" height="100"/>
+  <text class="head" x="1300" y="766">DLT / 실제 프로젝터</text>
+  <text class="body" x="1300" y="796">물리 보정·투사·오차 평가</text>
+  <text class="small" x="1300" y="820">현재는 후속 physical validation 단계</text>
+
+  <path class="arrow" d="M1377 676V710H300V722"/>
+  <path class="arrow" d="M1377 676V710H800V722"/>
+  <path class="arrow" d="M1377 676V722"/>
 </svg>

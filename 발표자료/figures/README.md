@@ -2,9 +2,11 @@
 
 이 폴더는 `agentic_audio_projection_mapping`의 실제 산출물 중 발표에 바로 쓸 수 있는 파일만 복사한 것이다. 원본 판정과 한계를 유지해야 하며, 아래의 `실패/HOLD` 자료를 성공 사례로 제시하면 안 된다.
 
+연구 파이프라인의 입력·출력·단계별 책임과 E237 구현값의 구분은 [`../연구_파이프라인_정리_2026-10-06.md`](../연구_파이프라인_정리_2026-10-06.md)에 정리했다.
+
 | 파일 | 용도 | 원본 근거와 판정 |
 |---|---|---|
-| `01_pipeline.svg` | 전체 파이프라인 도식 | 실제 구현 단계와 완료/미완료 범위를 근거 문서에 맞춰 재도식화 |
+| `01_pipeline.svg` | 연구 핵심 파이프라인 도식 | 입력·사건 source 생성·3D/UV 등록·오디오 편성·지속형 합성·최종 UV 비디오 텍스처를 연구 본체로 표시하고, WebGL·Unity·프로젝터는 후단 검증·적용으로 분리 |
 | `02_msr_regions_24.png` | 24시점 MSR 영역 | `outputs/pipeline_runs/therock_sb_resonance_prepare_v70/previews/msr_regions_surface_24.png` |
 | `03_msr_roles_24.png` | 24시점 역할 제안 | `outputs/pipeline_runs/therock_sb_resonance_prepare_v70/previews/msr_roles_surface_24.png`; 자동 역할은 제안이며 의미 정답이 아님 |
 | `04_e56_controlled_3d_comparison.png` | E56 통제 조건 비교 | `outputs/review_exports/experiment56/poster_figure_controlled_3d_comparison.png`; 개발 사례 |
@@ -27,6 +29,13 @@
 | `21_kangaroo_msrg_roles.png` | 캥거루 MSRG 자동 역할과 인접 관계 | `automatic_role_assignment_v57/kangaroo/manifest.json`의 자동 역할·무방향 `region_graph`만 사용; 1800×750 |
 
 영상 16·17은 UV atlas 영상이므로 그 자체가 일반 카메라 영상처럼 보이지 않는다. Unity의 원본 메시 UV에 영상 텍스처로 적용한 뒤 3D 또는 실제 projector 결과를 발표 영상으로 보여 주는 것이 올바른 사용법이다.
+
+## 01번 파이프라인 그림의 해석
+
+- 최종 연구 산출물은 고정 메시의 UV 좌표에 적용하는 오디오 포함 비디오 텍스처와 사건 시간표·provenance·QA 정보다.
+- WebGL viewer는 다각도 관찰과 QA를 위한 도구이며, 최종 산출물의 형식을 정의하지 않는다.
+- Unity와 DLT/projector 단계는 생성된 비디오 텍스처를 원본 메시와 실제 물체에 적용하고 검증하는 후단이다.
+- 현재 LTX 사건 source의 길이는 오디오가 자동 산출한 값이 아니라 연구자가 모델 호환 프레임 수 `73/97/145` 중에서 지정한 값이다. 오디오는 사건 종류·시작·중첩·생략을 결정한다.
 
 ## 캥거루 MSR·MSRG 그림 재현 정보
 
